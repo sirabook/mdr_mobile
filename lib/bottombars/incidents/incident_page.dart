@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:mdr_mobile/bottombars/home/severity.dart';
+import 'package:mdr_mobile/bottombars/incidents/incident_severity.dart';
+import 'package:mdr_mobile/bottombars/incidents/incident_summary.dart';
 import 'package:mdr_mobile/bottombars/days_filter.dart';
-import 'package:mdr_mobile/bottombars/home/summary.dart';
+import 'package:mdr_mobile/bottombars/incidents/incident_tenant.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+
+class IncidentPage extends StatefulWidget {
+  const IncidentPage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _IncidentPageState createState() => _IncidentPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _IncidentPageState extends State<IncidentPage> {
   int? selectedDays = 1; // ค่าเริ่มต้น: 1 วัน
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
@@ -33,7 +35,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Container(
       color: Color.fromARGB(255, 255, 240, 199),
-      child: ListView(      
+      child: ListView(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
@@ -47,23 +49,31 @@ class _HomePageState extends State<HomePage> {
                   selectedEndDate: selectedEndDate,
                   onFilterChanged: updateFilter,
                 ),
-                const SizedBox(height: 20),
+                 SizedBox(height: 20),
 
-                // 🔹 Dashboard
-                const Text(
-                  "Dashboard",
+                //  IncidentSummaryScreen
+                 Text(
+                  "Incident Summary",
                   style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                 ),
-                Severity(
+                IncidentSummary(
                   selectedDays: selectedDays,
                   selectedStartDate: selectedStartDate,
                   selectedEndDate: selectedEndDate,
                 ),
 
-                const SizedBox(height: 20),
-
-                // 🔹 Summary Actions
-                Summary(
+                 SizedBox(height: 20),
+                IncidentSeverity(
+                  selectedDays: selectedDays,
+                  selectedStartDate: selectedStartDate,
+                  selectedEndDate: selectedEndDate,
+                ),
+                SizedBox(height: 20),
+                 Text(
+                  "Tenant",
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                ),
+                IncidentTenant(
                   selectedDays: selectedDays,
                   selectedStartDate: selectedStartDate,
                   selectedEndDate: selectedEndDate,

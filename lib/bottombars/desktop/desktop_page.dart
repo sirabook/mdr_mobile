@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:mdr_mobile/bottombars/home/severity.dart';
 import 'package:mdr_mobile/bottombars/days_filter.dart';
-import 'package:mdr_mobile/bottombars/home/summary.dart';
+import 'package:mdr_mobile/bottombars/desktop/incident_list_page.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class DesktopPage extends StatefulWidget {
+  const DesktopPage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _DesktopPageState createState() => _DesktopPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  int? selectedDays = 1; // ค่าเริ่มต้น: 1 วัน
+class _DesktopPageState extends State<DesktopPage> {
+  int? selectedDays = 1;
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
 
@@ -31,46 +30,37 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Color.fromARGB(255, 255, 240, 199),
-      child: ListView(      
+    return Scaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 🔹 ใช้ DaysFilter ที่รองรับช่วงวัน
                 DaysFilter(
                   selectedDays: selectedDays,
                   selectedStartDate: selectedStartDate,
                   selectedEndDate: selectedEndDate,
                   onFilterChanged: updateFilter,
                 ),
-                const SizedBox(height: 20),
-
-                // 🔹 Dashboard
-                const Text(
-                  "Dashboard",
+                SizedBox(height: 20),
+                Text(
+                  "Incidents",
                   style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                ),
-                Severity(
-                  selectedDays: selectedDays,
-                  selectedStartDate: selectedStartDate,
-                  selectedEndDate: selectedEndDate,
-                ),
-
-                const SizedBox(height: 20),
-
-                // 🔹 Summary Actions
-                Summary(
-                  selectedDays: selectedDays,
-                  selectedStartDate: selectedStartDate,
-                  selectedEndDate: selectedEndDate,
                 ),
               ],
             ),
           ),
+          Expanded(
+            child: IncidentListPage(
+              selectedDays: selectedDays,
+              selectedStartDate: selectedStartDate,
+              selectedEndDate: selectedEndDate,
+            ),
+          ),
+          
         ],
       ),
     );

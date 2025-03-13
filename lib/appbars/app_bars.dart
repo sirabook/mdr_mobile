@@ -1,113 +1,124 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:mdr_mobile/users/profile_screen.dart';
 import 'package:mdr_mobile/users/login_screen.dart';
+import 'package:mdr_mobile/users/settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppBars extends StatelessWidget implements PreferredSizeWidget {
   final int notificationCount;
   final VoidCallback onNotificationTap;
   final GlobalKey<ScaffoldState> scaffoldKey;
-
+  final String  userId;
   const AppBars({
     Key? key,
     required this.notificationCount,
     required this.onNotificationTap,
     required this.scaffoldKey,
+    required this.userId,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.menu, color: Colors.purple, size: 40),
-        onPressed: () => scaffoldKey.currentState?.openDrawer(),
-      ),
-      actions: [
-        _buildIconWithBorder(
-          icon: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Icon(Icons.notifications, color: Colors.white, size: 30),
-              if (notificationCount > 0)
-                Positioned(
-                  right: -4,
-                  top: -4,
-                  child: badges.Badge(
-                    badgeContent: Text(
-                      '$notificationCount',
-                      style: const TextStyle(color: Colors.white, fontSize: 10),
-                    ),
-                    badgeStyle: const badges.BadgeStyle(badgeColor: Colors.red),
-                  ),
+    return Container(
+      color: Color.fromARGB(255, 255, 240, 199),
+      child: Padding(
+        padding: EdgeInsets.only(top: 20, left: 20, right: 20),
+        child: Row(
+          
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                _buildIconWithBorder(
+                  icon: const Icon(Icons.menu, color: Colors.white, size: 30),
+                  onTap: () => scaffoldKey.currentState?.openDrawer(),
                 ),
-            ],
-          ),
-          onTap: onNotificationTap,
-        ),
-        _buildIconWithBorder(
-          icon: const Icon(Icons.account_circle, color: Colors.white, size: 30),
-          onTap: () {
-            showMenu(
-              context: context,
-              position: const RelativeRect.fromLTRB(1000, 80, 10, 0),
-              items: [
+                const SizedBox(width: 10),
+                _buildIconWithBorder(
+                  icon: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const Icon(Icons.notifications, color: Colors.white, size: 30),
+                      if (notificationCount > 0)
+                        Positioned(
+                          right: -2,
+                          top: -2,
+                          child: badges.Badge(
+                            badgeContent: Text(
+                              '$notificationCount',
+                              style: const TextStyle(color: Colors.white, fontSize: 10),
+                            ),
+                            badgeStyle: const badges.BadgeStyle(badgeColor: Colors.red),
+                          ),
+                        ),
+                    ],
+                  ),
+                  onTap: onNotificationTap,
+                ),
+              ],
+            ),
+            PopupMenuButton<int>(
+              icon: const Icon(Icons.account_circle, color: Color(0xFF1B4D41), size: 50),
+              color: Colors.white,
+              onSelected: (value) async {
+                switch (value) {
+                  case 1:
+                    Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfileScreen(userId: userId)),
+                    );
+                    break;
+                  case 2:
+                    Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SettingsScreen(userId: userId)),
+                    );
+                    break;
+                  case 3:
+                    await FirebaseAuth.instance.signOut();
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    await prefs.clear();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                      (route) => false,
+                    );
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
                 const PopupMenuItem(value: 1, child: Text('Profile')),
                 const PopupMenuItem(value: 2, child: Text('Settings')),
                 const PopupMenuItem(value: 3, child: Text('Logout')),
               ],
-            ).then((value) async {
-              if (value != null) {
-                switch (value) {
-                  case 1:
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Profile Clicked')));
-                    break;
-                  case 2:
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Settings Clicked')));
-                    break;
-                  case 3:
-                  await FirebaseAuth.instance.signOut(); // ออกจากระบบ Firebase
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  await prefs.clear();
-                     Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => LoginScreen()),
-            (route) => false, // Remove all previous routes
-          );
-                    break;
-                }
-              }
-            });
-          },
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
-  Widget _buildIconWithBorder({required Widget icon, required VoidCallback onTap}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.purple,
-            border: Border.all(color: Colors.purple, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.4),
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
+  Widget _buildIconWithBorder({
+    required Widget icon,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1B4D41),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 6,
           ),
-          child: Center(child: icon),
-        ),
+        ],
+      ),
+      child: InkWell(
+        onTap: onTap,
+        child: icon,
       ),
     );
   }
